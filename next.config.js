@@ -2,10 +2,6 @@ const packageJson = require("./package.json");
 const deps = packageJson.dependencies;
 
 module.exports = {
-  react: {
-    useSuspense: false,
-    wait: true,
-  },
   webpack: (config, { webpack }) => {
     const { ModuleFederationPlugin } = webpack.container;
 
@@ -20,13 +16,15 @@ module.exports = {
         exposes: {
           "./Folder": "./src/Folder",
         },
+        remoteType: "var",
         remotes: {
           task_tracker_components:
-            "task_tracker_components@https://micro-frontwindows-components.vercel.app/_next/static/runtime/remoteEntry.js",
+            "task_tracker_components",
         },
         shared: {
           react: {
             singleton: true,
+            eager: true,
             requiredVersion: deps.react,
           },
           "react-dom": {
@@ -50,6 +48,12 @@ module.exports = {
         shared: [],
       })
     );
+
+    // config.module.rules.push({
+    //   test: /_app.js/,
+    //   loader: "@module-federation/nextjs-mf/lib/federation-loader.js",
+    // });
+
     return config;
   },
 };
